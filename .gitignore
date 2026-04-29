@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.venv/
+venv/
+
+X_scaled.csv
+X_scaled.pkl
+login_success_vs_failure.png
+
+.ipynb_checkpoints/
