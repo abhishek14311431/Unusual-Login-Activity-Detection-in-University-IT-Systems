@@ -15,3 +15,7 @@ backend/data/rba-dataset.csv
 backend/data/*.npy
 backend/data/*.pkl
 backend/models/*.pkl
+backend/data/rba-dataset.csv
+backend/data/*.npy
+backend/data/*.pkl
+backend/models/*.pkl
