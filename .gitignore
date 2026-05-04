@@ -11,3 +11,7 @@ X_scaled.pkl
 login_success_vs_failure.png
 
 .ipynb_checkpoints/
+backend/data/rba-dataset.csv
+backend/data/*.npy
+backend/data/*.pkl
+backend/models/*.pkl
