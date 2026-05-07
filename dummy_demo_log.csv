@@ -1,0 +1,5 @@
+user_id,ip_address,browser,os,hour_of_day,day_of_week
+stud_8821,10.21.44.12,Chrome,Windows,14,1
+fac_9901,103.4.22.11,Firefox,Linux,3,2
+admin_alpha,192.168.1.5,Safari,MacOS,10,0
+sys_root,210.89.61.1,Chrome,Windows,2,3
