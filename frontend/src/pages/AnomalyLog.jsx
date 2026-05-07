@@ -42,7 +42,8 @@ const AnomalyLog = () => {
       setIsAuditActive(true);
     } catch (error) {
       console.error('Audit failed:', error);
-      alert('Audit failed. Ensure CSV format is correct.');
+      const errorMsg = error.response?.data?.detail || 'Audit failed. Ensure CSV format is correct.';
+      alert(`Audit failed: ${errorMsg}`);
     } finally {
       setUploadLoading(false);
       setLoading(false);
