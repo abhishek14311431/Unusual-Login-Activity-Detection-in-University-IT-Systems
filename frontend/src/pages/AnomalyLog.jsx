@@ -35,6 +35,7 @@ const AnomalyLog = () => {
     } finally {
       setUploadLoading(false);
       setLoading(false);
+      event.target.value = ''; // Clear input to allow re-upload of same file
     }
   };
 
