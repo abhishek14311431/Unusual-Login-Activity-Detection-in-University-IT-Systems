@@ -8,22 +8,33 @@ const AnomalyLog = () => {
   const [loading, setLoading] = useState(true);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [isAuditActive, setIsAuditActive] = useState(false);
+  const [auditStats, setAuditStats] = useState(null);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     setUploadLoading(true);
+    setAnomalies([]); // Clear previous to show loading state
+    
+    // Artificial 3-second delay for realistic analysis effect
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
     const formData = new FormData();
     formData.append('file', file);
 
     try {
       const response = await uploadDataset(formData);
+      setAuditStats({
+        scanned: response.data.total_records,
+        anomalies: response.data.anomalies_detected
+      });
       const results = response.data.top_anomalies.map((item, index) => ({
         id: `audit-${index}`,
         user: item.user_id,
         ip: item.ip_address,
         risk: item.risk_level,
+        score: item.risk_score,
         reason: item.reason,
         time: `${item.hour_of_day}:00`
       }));
@@ -65,7 +76,7 @@ const AnomalyLog = () => {
             {isAuditActive ? 'AI Audit Results' : 'Anomaly Audit Log'}
           </h2>
           <p className="text-slate-400 font-bold mt-1 uppercase text-xs tracking-[0.2em]">
-            {isAuditActive ? 'Direct dataset analysis engine' : 'Secured Behavioral Ledger'}
+            {isAuditActive ? `Analysed ${auditStats.scanned} Records | ${auditStats.anomalies} Anomalies Identified` : 'Secured Behavioral Ledger'}
           </p>
         </div>
         
@@ -96,6 +107,7 @@ const AnomalyLog = () => {
             <tr className="bg-slate-900/5 border-b border-white/20">
               <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Subject Signature</th>
               <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Threat Level</th>
+              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Risk Score</th>
               <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Behavioral Reasoning</th>
               <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Temporal Marker</th>
             </tr>
@@ -116,6 +128,15 @@ const AnomalyLog = () => {
                 </td>
                 <td className="px-8 py-6 text-center">
                   <RiskBadge level={item.risk} />
+                </td>
+                <td className="px-8 py-6">
+                  <span className={`font-mono font-black text-sm px-3 py-1 rounded-lg ${
+                    item.score > 7 ? 'bg-red-500/10 text-red-600' : 
+                    item.score > 4 ? 'bg-orange-500/10 text-orange-600' : 
+                    'bg-blue-500/10 text-blue-600'
+                  }`}>
+                    {item.score || '---'}
+                  </span>
                 </td>
                 <td className="px-8 py-6">
                   <div className="flex items-center text-sm font-bold text-slate-600">

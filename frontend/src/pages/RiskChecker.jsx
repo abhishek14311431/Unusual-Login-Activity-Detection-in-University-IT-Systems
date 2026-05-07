@@ -18,6 +18,11 @@ const RiskChecker = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setResult(null); // Clear previous result
+    
+    // Artificial 2-second delay for analysis effect
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     try {
       const res = await checkLogin(formData);
       setResult(res.data);
@@ -86,11 +91,12 @@ const RiskChecker = () => {
 
           <div className="space-y-3">
             <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center text-slate-600">
-               Temporal Context (0-23)
+               Login Time (24h Format: 00-23)
             </label>
             <input 
               type="number" min="0" max="23"
               className="w-full p-4 glass-input font-bold text-slate-700"
+              placeholder="e.g. 14 for 2 PM"
               value={formData.hour_of_day}
               onChange={(e) => setFormData({...formData, hour_of_day: parseInt(e.target.value)})}
             />
