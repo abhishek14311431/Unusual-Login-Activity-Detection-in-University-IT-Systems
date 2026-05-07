@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// In production, this should be your Render backend URL
+const BASE_URL = 'https://uniguard-backend.onrender.com/api';
+
 const api = axios.create({
-  baseURL: '/api'
+  baseURL: BASE_URL
 });
 
 export const getStats = () => api.get('/stats');
