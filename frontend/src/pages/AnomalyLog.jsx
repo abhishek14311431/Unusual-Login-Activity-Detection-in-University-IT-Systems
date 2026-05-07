@@ -52,33 +52,33 @@ const AnomalyLog = () => {
   };
 
   useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        setAnomalies([
-          { id: 1, user: 'admin_test', ip: '103.4.22.11', risk: 'High', reason: 'Unusual IP Range + PCA Outlier', time: '10:42 AM' },
-          { id: 2, user: 'stud_882', ip: '192.168.4.1', risk: 'Medium', reason: 'Late Night Access Pattern', time: '03:15 AM' },
-          { id: 3, user: 'fac_991', ip: '45.1.2.3', risk: 'High', reason: 'DBSCAN Cluster Noise Detected', time: '11:20 PM' },
-          { id: 4, user: 'guest_01', ip: '8.8.8.8', risk: 'Low', reason: 'Standard verification', time: '09:00 AM' },
-        ]);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    };
-    if (!isAuditActive) fetchLogs();
-  }, [isAuditActive]);
+    // We remove the default sample data strictly to keep it clean before upload
+    setAnomalies([]);
+    setLoading(false);
+  }, []);
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
       <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-3xl font-black text-slate-800 tracking-tighter">
-            {isAuditActive ? 'AI Audit Results' : 'Anomaly Audit Log'}
+          <h2 className="text-4xl font-black text-slate-800 tracking-tighter drop-shadow-sm">
+            {isAuditActive ? 'AI Audit Report' : 'Security Ledger'}
           </h2>
-          <p className="text-slate-400 font-bold mt-1 uppercase text-xs tracking-[0.2em]">
-            {isAuditActive ? `Analysed ${auditStats.scanned} Records | ${auditStats.anomalies} Anomalies Identified` : 'Secured Behavioral Ledger'}
-          </p>
+          {isAuditActive && (
+            <div className="flex items-center space-x-3 mt-2">
+              <span className="px-3 py-1 bg-blue-600/10 text-blue-700 rounded-full text-xs font-black tracking-widest uppercase border border-blue-200/50">
+                SCANNED: {auditStats.scanned}
+              </span>
+              <span className="px-3 py-1 bg-red-600/10 text-red-700 rounded-full text-xs font-black tracking-widest uppercase border border-red-200/50">
+                THREATS: {auditStats.anomalies}
+              </span>
+            </div>
+          )}
+          {!isAuditActive && (
+            <p className="text-slate-400 font-bold mt-1 uppercase text-xs tracking-[0.2em]">
+              Behavioral Signal Intelligence
+            </p>
+          )}
         </div>
         
         <div className="flex items-center space-x-4">
@@ -102,20 +102,20 @@ const AnomalyLog = () => {
         </div>
       </div>
 
-      <div className="glass-card overflow-hidden border-none shadow-2xl">
+      <div className="bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] overflow-hidden transition-all duration-500 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.12)]">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-900/5 border-b border-white/20">
-              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Subject Signature</th>
-              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Threat Level</th>
-              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Risk Score</th>
-              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Behavioral Reasoning</th>
-              <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Temporal Marker</th>
+            <tr className="bg-slate-900/5 border-b border-white/30">
+              <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Subject Signature</th>
+              <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center">Threat Level</th>
+              <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Risk Score</th>
+              <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Behavioral Reasoning</th>
+              <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Login Time</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/10">
-            {anomalies.map((item) => (
-              <tr key={item.id} className="hover:bg-white/40 transition-all duration-300 group">
+          <tbody className="divide-y divide-white/20">
+            {anomalies.length > 0 ? anomalies.map((item) => (
+              <tr key={item.id} className="hover:bg-white/60 transition-all duration-300 group">
                 <td className="px-8 py-6">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-500">
@@ -149,7 +149,25 @@ const AnomalyLog = () => {
                   {item.time}
                 </td>
               </tr>
-            ))}
+            )) : (
+              <tr>
+                <td colSpan="5" className="px-8 py-32 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-4 opacity-40">
+                    <div className="p-8 bg-white/50 rounded-full border border-white/40 shadow-inner">
+                      <FileCheck size={48} className="text-blue-500" />
+                    </div>
+                    <div>
+                      <div className="text-slate-800 font-black tracking-[0.2em] text-xs uppercase mb-1">
+                        Secure Behavioral Audit
+                      </div>
+                      <p className="text-slate-400 text-sm font-bold max-w-[250px] mx-auto leading-relaxed">
+                        The ledger is currently clear. Upload a csv dataset to perform deep-link behavioral analysis.
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
         
