@@ -179,48 +179,6 @@ const Dashboard = () => {
             <div className="text-xs text-slate-400 mb-1">Model Version</div>
             <div className="text-sm font-bold">UniGuard-v2.1 (PCA+KMeans)</div>
           </div>
-
-          <div className="mt-8 pt-8 border-t border-slate-800">
-            <h4 className="text-sm font-black uppercase tracking-widest text-blue-400 mb-4">Demo: Dataset Audit</h4>
-            {!uploadResult ? (
-              <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-3xl cursor-pointer transition-all duration-300 ${uploadLoading ? 'border-slate-700 bg-slate-800' : 'border-slate-700 hover:border-blue-500 hover:bg-slate-800/50'}`}>
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  {uploadLoading ? (
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
-                  ) : (
-                    <>
-                      <Upload className="w-8 h-8 mb-3 text-slate-500" />
-                      <p className="text-xs text-slate-400 font-bold">Upload CSV Dataset</p>
-                    </>
-                  )}
-                </div>
-                <input type="file" className="hidden" accept=".csv" onChange={handleFileUpload} disabled={uploadLoading} />
-              </label>
-            ) : (
-              <div className="bg-blue-600/20 rounded-3xl p-6 border border-blue-500/30 animate-in fade-in zoom-in">
-                <div className="flex items-center space-x-3 mb-4">
-                  <CheckCircle className="text-blue-400" size={20} />
-                  <span className="text-sm font-black">Audit Complete</span>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-[10px] text-slate-400 uppercase font-black">Scanned</div>
-                    <div className="text-lg font-black">{uploadResult.total_records}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-red-400 uppercase font-black">Anomalies</div>
-                    <div className="text-lg font-black text-red-400">{uploadResult.anomalies_detected}</div>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setUploadResult(null)}
-                  className="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold transition-colors"
-                >
-                  Analyze New File
-                </button>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>

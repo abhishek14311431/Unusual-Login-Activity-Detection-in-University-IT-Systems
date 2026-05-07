@@ -23,8 +23,8 @@ const AnomalyLog = () => {
         id: `audit-${index}`,
         user: item.user_id,
         ip: item.ip_address,
-        risk: item.risk_score > 7 ? 'High' : 'Medium',
-        reason: item.status === 'Anomaly' ? 'Behavioral Outlier (Demo)' : 'Valid Pattern',
+        risk: item.risk_level,
+        reason: item.reason,
         time: `${item.hour_of_day}:00`
       }));
       setAnomalies(results);

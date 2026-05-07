@@ -49,14 +49,20 @@ async def upload_dataset(file: UploadFile = File(...)):
         required = ['user_id', 'hour_of_day', 'ip_address']
         if not all(col in df.columns for col in required):
             raise HTTPException(status_code=400, detail=f'Dataset must contain columns: {required}')
-        df['risk_score'] = df['hour_of_day'].apply(lambda x: 8.5 if (x < 5 or x > 23) else 1.2)
-        df['status'] = df['risk_score'].apply(lambda x: 'Anomaly' if x > 5 else 'Normal')
-        summary = {
+        
+        def process_row(hour):
+            if hour < 5 or hour > 23: return 8.5, 'High', 'Critical Time Outlier'
+            if hour < 8 or hour > 20: return 5.2, 'Medium', 'Suspect Temporal Pattern'
+            return 1.2, 'Low', 'Standard Activity'
+
+        df[['risk_score', 'risk_level', 'reason']] = df['hour_of_day'].apply(lambda x: pd.Series(process_row(x)))
+        df['status'] = df['risk_level'].apply(lambda x: 'Anomaly' if x != 'Low' else 'Normal')
+        
+        return {
             'total_records': len(df),
             'anomalies_detected': int(len(df[df['status'] == 'Anomaly'])),
-            'top_anomalies': df[df['status'] == 'Anomaly'].head(10).to_dict(orient='records')
+            'top_anomalies': df.to_dict(orient='records')
         }
-        return summary
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
