@@ -1,17 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, Clock, Globe, ShieldQuestion } from 'lucide-react';
-import { getStats } from '../services/api';
+import { AlertCircle, Clock, Globe, ShieldQuestion, Upload, FileCheck, CheckCircle, AlertTriangle } from 'lucide-react';
+import { getStats, uploadDataset } from '../services/api';
 import RiskBadge from '../components/RiskBadge';
 
 const AnomalyLog = () => {
   const [anomalies, setAnomalies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [isAuditActive, setIsAuditActive] = useState(false);
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setUploadLoading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await uploadDataset(formData);
+      const results = response.data.top_anomalies.map((item, index) => ({
+        id: `audit-${index}`,
+        user: item.user_id,
+        ip: item.ip_address,
+        risk: item.risk_score > 7 ? 'High' : 'Medium',
+        reason: item.status === 'Anomaly' ? 'Behavioral Outlier (Demo)' : 'Valid Pattern',
+        time: `${item.hour_of_day}:00`
+      }));
+      setAnomalies(results);
+      setIsAuditActive(true);
+    } catch (error) {
+      console.error('Audit failed:', error);
+      alert('Audit failed. Ensure CSV format is correct.');
+    } finally {
+      setUploadLoading(false);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await getStats();
-        // Mocking some log entries for visual proof of the structure
         setAnomalies([
           { id: 1, user: 'admin_test', ip: '103.4.22.11', risk: 'High', reason: 'Unusual IP Range + PCA Outlier', time: '10:42 AM' },
           { id: 2, user: 'stud_882', ip: '192.168.4.1', risk: 'Medium', reason: 'Late Night Access Pattern', time: '03:15 AM' },
@@ -24,19 +53,40 @@ const AnomalyLog = () => {
         setLoading(false);
       }
     };
-    fetchLogs();
-  }, []);
+    if (!isAuditActive) fetchLogs();
+  }, [isAuditActive]);
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
       <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-3xl font-black text-slate-800 tracking-tighter">Anomaly Audit Log</h2>
-          <p className="text-slate-400 font-bold mt-1 uppercase text-xs tracking-[0.2em]">Secured Behavioral Ledger</p>
+          <h2 className="text-3xl font-black text-slate-800 tracking-tighter">
+            {isAuditActive ? 'AI Audit Results' : 'Anomaly Audit Log'}
+          </h2>
+          <p className="text-slate-400 font-bold mt-1 uppercase text-xs tracking-[0.2em]">
+            {isAuditActive ? 'Direct dataset analysis engine' : 'Secured Behavioral Ledger'}
+          </p>
         </div>
-        <button className="glass-button px-6 py-3 rounded-2xl text-sm font-black tracking-tight">
-          Export Intelligence (.csv)
-        </button>
+        
+        <div className="flex items-center space-x-4">
+          {isAuditActive && (
+            <button 
+              onClick={() => setIsAuditActive(false)}
+              className="text-slate-500 font-bold text-sm hover:text-blue-600 transition-colors"
+            >
+              Reset to Live Logs
+            </button>
+          )}
+          <label className="glass-button px-6 py-3 rounded-2xl text-sm font-black tracking-tight cursor-pointer flex items-center space-x-2">
+            {uploadLoading ? (
+               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            ) : (
+              <Upload size={18} />
+            )}
+            <span>{isAuditActive ? 'Re-Audit Dataset' : 'Audit Dataset (.csv)'}</span>
+            <input type="file" className="hidden" accept=".csv" onChange={handleFileUpload} disabled={uploadLoading} />
+          </label>
+        </div>
       </div>
 
       <div className="glass-card overflow-hidden border-none shadow-2xl">
