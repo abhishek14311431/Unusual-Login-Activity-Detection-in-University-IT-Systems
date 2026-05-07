@@ -11,7 +11,17 @@ import {
 } from 'lucide-react';
 import { getStats, uploadDataset } from '../services/api';
 import StatCard from '../components/StatCard'
-// ... (rest of imports)
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  AreaChart,
+  Area 
+} from 'recharts';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
