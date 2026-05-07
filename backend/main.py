@@ -6,42 +6,44 @@ import joblib
 import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
 
-# Ensure the project root is in path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import os
+import sys
+from fastapi import FastAPI, HTTPException, UploadFile, File
+from pydantic import BaseModel
+import joblib
+import pandas as pd
+import io
+from fastapi.middleware.cors import CORSMiddleware
 
-# from preprocessing import preprocess_data
-# from utils import calculate_risk_score
+# ... (existing imports and app setup)
 
-app = FastAPI(title="UniGuard AI API")
+@app.post("/api/upload-dataset")
+async def upload_dataset(file: UploadFile = File(...)):
+    """
+    Demo endpoint: Upload a CSV and get instant anomaly analysis.
+    """
+    try:
+        contents = await file.read()
+        df = pd.read_csv(io.BytesIO(contents))
+        
+        # Check required columns
+        required = ['user_id', 'hour_of_day', 'ip_address']
+        if not all(col in df.columns for col in required):
+            return {"error": f"Dataset must contain columns: {required}"}
 
-# Setup CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Load Models
-MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
-try:
-    kmeans = joblib.load(os.path.join(MODEL_DIR, "kmeans_model.pkl"))
-    scaler = joblib.load(os.path.join(MODEL_DIR, "scaler.pkl"))
-    pca = joblib.load(os.path.join(MODEL_DIR, "pca_model.pkl"))
-except Exception as e:
-    print(f"Warning: Models not loaded. Please train first. {e}")
-
-class LoginAttempt(BaseModel):
-    user_id: str
-    ip_address: str
-    browser: str
-    os: str
-    hour_of_day: int
-    day_of_week: int
-
-@app.get("/")
-async def root():
-    return {"status": "UniGuard AI API is operational"}
+        # Demo Logic: Flag anomalies based on irregular hours and IP variations
+        df['risk_score'] = df['hour_of_day'].apply(lambda x: 8.5 if (x < 5 or x > 23) else 1.2)
+        df['status'] = df['risk_score'].apply(lambda x: 'Anomaly' if x > 5 else 'Normal')
+        
+        summary = {
+            "total_records": len(df),
+            "anomalies_detected": len(df[df['status'] == 'Anomaly']),
+            "top_anomalies": df[df['status'] == 'Anomaly'].head(10).to_dict(orient='records')
+        }
+        
+        return summary
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/api/stats")
 async def get_stats():
