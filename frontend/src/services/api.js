@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// In production, this should be your Render backend URL
-const BASE_URL = 'https://uniguard-backend.onrender.com/api';
+// Updated to match your exact Render URL from screenshot
+const BASE_URL = 'https://unusual-login-activity-detection-in.onrender.com/api';
 
 const api = axios.create({
   baseURL: BASE_URL
