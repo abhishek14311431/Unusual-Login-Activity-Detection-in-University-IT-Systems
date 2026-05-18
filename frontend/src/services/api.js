@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// Updated to match your exact Render URL from screenshot
-const BASE_URL = 'https://unusual-login-activity-detection-in.onrender.com/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const api = axios.create({
   baseURL: BASE_URL

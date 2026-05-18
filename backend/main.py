@@ -41,6 +41,11 @@ class LoginAttempt(BaseModel):
 async def root():
     return {'status': 'UniGuard AI API is operational'}
 
+
+@app.get('/health')
+async def health_check():
+    return {'status': 'healthy'}
+
 @app.post('/api/upload-dataset')
 async def upload_dataset(file: UploadFile = File(...)):
     try:
